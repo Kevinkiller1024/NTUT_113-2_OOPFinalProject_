@@ -1,20 +1,21 @@
-public abstract class Platform {
-    protected int x, y, width, height;
+import java.awt.*;
+import java.util.Random;
 
-    public Platform(int x, int y, int width, int height) {
-        this.x = x; this.y = y; this.width = width; this.height = height;
+public class Platform {
+    public int x, y;
+    public int width = 60, height = 10;
+
+    public Platform(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public abstract void draw(Graphics g);
-
-    public boolean isSteppedOn(Player player) {
-        Rectangle playerRect = player.getBounds();
-        Rectangle platformRect = new Rectangle(x, y, width, height);
-        return playerRect.intersects(platformRect)
-                && player.getBottomY() <= y + 10
-                && player.getVy() >= 0;
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
     }
 
-    public int getY() { return y; }
-    public int getHeight() { return height; }
+    public void draw(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.fillRect(x, y, width, height);
+    }
 }

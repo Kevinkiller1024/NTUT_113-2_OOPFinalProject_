@@ -1,38 +1,40 @@
+import java.awt.*;
+
 public class Player {
-    private int x, y, width = 30, height = 30;
-    private double vy = 0;
-    private final double GRAVITY = 0.5;
-    private final int MOVE_SPEED = 5;
+    public int x, y;
+    public int width = 30, height = 30;
+    public double velocityY = 0;
+    public int speed = 10;
+    public boolean isAlive = true;
 
     public Player(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public void moveLeft() { x -= MOVE_SPEED; }
-    public void moveRight() { x += MOVE_SPEED; }
-    public void applyGravity() { vy += GRAVITY; }
-    public void update() { y += vy; }
+    public void update() {
+        velocityY += 0.5; // gravity
+        y += velocityY;
+    }
 
-    public void draw(Graphics g) {
-        g.setColor(Color.WHITE);
-        g.fillRect(x, y, width, height);
+    public void moveLeft() {
+        x -= speed;
+    }
+
+    public void moveRight() {
+        x += speed;
+    }
+
+    public void jump() {
+        velocityY = -10;
     }
 
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
     }
 
-    public int getBottomY() {
-        return y + height;
-    }
-
-    public double getVy() {
-        return vy;
-    }
-
-    public void landOn(int platformY) {
-        vy = 0;
-        y = platformY - height;
+    public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        g.fillRect(x, y, width, height);
     }
 }

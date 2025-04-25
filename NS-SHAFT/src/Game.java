@@ -1,15 +1,17 @@
 import javax.swing.*;
 
-public class Main {
+public class Game {
     public static void main(String[] args) {
-        JFrame frame = new JFrame("NS-Shaft Clone");
+        JFrame frame = new JFrame("NS-SHAFT in Java");
+        GamePanel panel = new GamePanel();
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setSize(400, 600);
-
-        GamePanel panel = new GamePanel();
-        frame.add(Panel);
+        frame.add(panel);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
         panel.startGame();
     }
 }
