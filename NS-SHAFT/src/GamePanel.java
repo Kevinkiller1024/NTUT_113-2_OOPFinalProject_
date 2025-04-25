@@ -8,11 +8,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private Player player;
     private ArrayList<Platform> platforms;
-    private int panelWidth = 550;
-    private int panelHeight = 400;
+    private int panelWidth = 470;
+    private int panelHeight = 700;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private Random rand = new Random();
+    private int score = 0;
 
     public GamePanel() {
         setPreferredSize(new Dimension(panelWidth, panelHeight));
@@ -23,7 +24,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         player = new Player(panelWidth / 2 - 15, panelHeight / 2);
         platforms = new ArrayList<>();
 
-        for (int i = 0; i < 8; i++) {
+        // 初始化平台，確保玩家腳下有一個平台
+        platforms.add(new Platform(player.x, player.y + player.height + 5));
+        for (int i = 1; i < 8; i++) {
             platforms.add(new Platform(rand.nextInt(panelWidth - 60), i * 80));
         }
 
@@ -50,6 +53,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             for (Platform p : platforms) {
                 p.y += dy;
             }
+            score += dy; // 加分：根據往下距離加分
         }
 
         for (Platform p : platforms) {
@@ -79,6 +83,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         player.draw(g);
+
+        // 顯示分數
+        g.setColor(Color.BLUE);
+        g.setFont(new Font("Arial", Font.PLAIN, 18));
+        g.drawString("Score: " + score, 10, 20);
 
         if (!player.isAlive) {
             g.setColor(Color.BLACK);
