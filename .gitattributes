@@ -1,0 +1,26 @@
+# 對所有文字檔使用 Unix 換行格式 (LF)
+* text=auto eol=lf
+
+# 對 .idea 設定：保持 LF，避免 Git 警告
+.idea/* text eol=lf
+
+# Java 原始碼檔案
+*.java text eol=lf
+
+# XML、HTML、CSS、JS 等設定與前端檔案
+*.xml text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+
+# Markdown 與文字檔
+*.md   text eol=lf
+*.txt  text eol=lf
+
+# 保持二進位檔案原樣（不要轉換換行）
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.jar  binary
+*.class binary

@@ -1,36 +1,38 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashSet;
 
-public class GamePanel extends JPanel implements ActionListener, KeyListener {
+public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener {
     private Timer timer;
     private Player player;
-    private ArrayList<Platform> platforms;
-    private int panelWidth = 470;
-    private int panelHeight = 700;
-    private boolean leftPressed = false;
-    private boolean rightPressed = false;
-    private Random rand = new Random();
-    private int score = 0;
+    private PlatformManager platformManager;
+    private ScoreManager scoreManager;
+    private int panelWidth = 470, panelHeight = 700;
+    private HashSet<Platform> scored = new HashSet<>();
+    private boolean leftPressed = false, rightPressed = false;
 
     public GamePanel() {
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         setBackground(Color.WHITE);
         setFocusable(true);
         addKeyListener(this);
+        addMouseListener(this);
 
-        player = new Player(panelWidth / 2 - 15, panelHeight / 2);
-        platforms = new ArrayList<>();
-
-        // 初始化平台，確保玩家腳下有一個平台
-        platforms.add(new Platform(player.x, player.y + player.height + 5));
-        for (int i = 1; i < 8; i++) {
-            platforms.add(new Platform(rand.nextInt(panelWidth - 60), i * 80));
-        }
-
+        platformManager = new PlatformManager(panelWidth, panelHeight);
+        scoreManager = new ScoreManager();
         timer = new Timer(16, this);
+
+        initGame();
+    }
+
+    private void initGame() {
+        player = new Player(panelWidth / 2 - 15, 100);
+        platformManager.init(player);
+        scoreManager.reset();
+        scored.clear();
+        player.isAlive = true;
+        player.health = 100;
     }
 
     public void startGame() {
@@ -43,33 +45,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         player.update();
 
-        if (leftPressed) player.moveLeft();
-        if (rightPressed) player.moveRight();
+        if (leftPressed && player.x > 0) player.moveLeft();
+        if (rightPressed && player.x + player.width < panelWidth) player.moveRight();
 
-        // Screen scroll effect
-        if (player.y < panelHeight / 2) {
-            int dy = panelHeight / 2 - player.y;
-            player.y = panelHeight / 2;
-            for (Platform p : platforms) {
-                p.y += dy;
-            }
-            score += dy; // 加分：根據往下距離加分
-        }
+        int scrollSpeed = scoreManager.getScrollSpeed();
+        platformManager.update(scrollSpeed);
+        platformManager.checkCollision(player);
 
-        for (Platform p : platforms) {
-            if (player.velocityY > 0 && player.getBounds().intersects(p.getBounds())) {
-                player.jump();
+        for (Platform p : platformManager.getPlatforms()) {
+            if (!scored.contains(p) && p.y + Platform.HEIGHT < player.y + player.height) {
+                scored.add(p);
+                scoreManager.increase();
             }
         }
 
-        // Remove off-screen platforms and add new ones
-        platforms.removeIf(p -> p.y > panelHeight);
-        while (platforms.size() < 8) {
-            int lastY = platforms.get(platforms.size() - 1).y;
-            platforms.add(new Platform(rand.nextInt(panelWidth - 60), lastY - 80));
-        }
-
-        if (player.y > panelHeight) player.isAlive = false;
+        if (player.y > panelHeight || player.y < 0) player.isAlive = false;
 
         repaint();
     }
@@ -78,21 +68,31 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        for (Platform p : platforms) {
+        for (Platform p : platformManager.getPlatforms()) {
             p.draw(g);
         }
 
         player.draw(g);
 
-        // 顯示分數
+        // 分數顯示
         g.setColor(Color.BLUE);
         g.setFont(new Font("Arial", Font.PLAIN, 18));
-        g.drawString("Score: " + score, 10, 20);
+        g.drawString("Score: " + scoreManager.getScore(), 10, 20);
+
+        // HP Bar
+        g.setColor(Color.GRAY);
+        g.fillRect(10, 40, 100, 10);
+        g.setColor(Color.RED);
+        g.fillRect(10, 40, player.health, 10);
+        g.setColor(Color.BLACK);
+        g.drawRect(10, 40, 100, 10);
 
         if (!player.isAlive) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.BOLD, 32));
             g.drawString("Game Over", panelWidth / 2 - 80, panelHeight / 2);
+            g.setFont(new Font("Arial", Font.PLAIN, 18));
+            g.drawString("Click to restart", panelWidth / 2 - 70, panelHeight / 2 + 40);
         }
     }
 
@@ -100,6 +100,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = true;
+        if (!player.isAlive && e.getKeyCode() == KeyEvent.VK_SPACE) initGame();
     }
 
     @Override
@@ -108,6 +109,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = false;
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {}
+    @Override public void keyTyped(KeyEvent e) {}
+    @Override public void mouseClicked(MouseEvent e) {
+        if (!player.isAlive) initGame();
+    }
+    @Override public void mousePressed(MouseEvent e) {}
+    @Override public void mouseReleased(MouseEvent e) {}
+    @Override public void mouseEntered(MouseEvent e) {}
+    @Override public void mouseExited(MouseEvent e) {}
 }
