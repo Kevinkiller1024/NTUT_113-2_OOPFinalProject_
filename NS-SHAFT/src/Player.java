@@ -29,7 +29,7 @@ public class Player {
     }
 
     public void takeDamage() {
-        health -= 10;
+        health -= 2;
         if (health <= 0) {
             health = 0;
             isAlive = false;

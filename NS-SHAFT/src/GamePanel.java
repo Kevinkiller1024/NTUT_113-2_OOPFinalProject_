@@ -81,11 +81,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
         // HP Bar
         g.setColor(Color.GRAY);
-        g.fillRect(10, 40, 100, 10);
+        g.fillRect(360, 10, 100, 10);
         g.setColor(Color.RED);
-        g.fillRect(10, 40, player.health, 10);
+        g.fillRect(360, 10, player.health, 10);
         g.setColor(Color.BLACK);
-        g.drawRect(10, 40, 100, 10);
+        g.drawRect(360, 10, 100, 10);
 
         if (!player.isAlive) {
             g.setColor(Color.BLACK);
