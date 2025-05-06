@@ -54,8 +54,8 @@ public class PlatformManager {
 
             boolean onPlatform =
                     player.velocityY >= 0 &&
-                            currBounds.y + currBounds.height <= plat.y + 10 &&
-                            currBounds.y + currBounds.height >= plat.y - 10 &&
+                            currBounds.y + currBounds.height <= plat.y + 15 &&
+                            currBounds.y + currBounds.height >= plat.y - 15 &&
                             currBounds.x + currBounds.width > plat.x &&
                             currBounds.x < plat.x + Platform.WIDTH;
 

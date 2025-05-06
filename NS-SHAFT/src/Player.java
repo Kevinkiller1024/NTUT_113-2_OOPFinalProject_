@@ -4,7 +4,7 @@ public class Player {
     public int x, y, prevY;
     public int width = 30, height = 30;
     public double velocityY = 0;
-    public int speed = 5;
+    public double speed = 5;
     public boolean isAlive = true;
     public int health = 100; // 用百分比顯示
 
@@ -15,6 +15,7 @@ public class Player {
     }
 
     public void update() {
+        //speed+=0.1;
         prevY = y;
         velocityY += 0.5;
         y += velocityY;
