@@ -1,14 +1,16 @@
+import java.io.*;
+
 public class ScoreManager {
     private int score = 0;
-    private long startTime;
+    private int highScore = 0;
+    private static final String FILE_NAME = "highscore.dat";
 
     public ScoreManager() {
-        startTime = System.currentTimeMillis();
+        loadHighScore();
     }
 
     public void reset() {
         score = 0;
-        startTime = System.currentTimeMillis();
     }
 
     public void increase() {
@@ -19,8 +21,38 @@ public class ScoreManager {
         return score;
     }
 
+    public int getHighScore() {
+        return highScore;
+    }
+
+    public boolean shouldUpdateHighScore() {
+        return score > highScore;
+    }
+
+    public void updateHighScoreIfNeeded() {
+        if (shouldUpdateHighScore()) {
+            highScore = score;
+            saveHighScore();
+        }
+    }
+
     public int getScrollSpeed() {
-        long elapsed = (System.currentTimeMillis() - startTime) / 1000;
-        return 2 + (int)(elapsed / 5);
+        return 3 + (score / 30);
+    }
+
+    private void loadHighScore() {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(FILE_NAME))) {
+            highScore = dis.readInt();
+        } catch (IOException e) {
+            highScore = 0;
+        }
+    }
+
+    private void saveHighScore() {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(FILE_NAME))) {
+            dos.writeInt(highScore);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

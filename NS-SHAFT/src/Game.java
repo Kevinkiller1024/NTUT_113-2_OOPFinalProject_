@@ -21,8 +21,6 @@ public class Game {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        // 預設顯示主選單
         cardLayout.show(mainPanel, "menu");
-
     }
 }

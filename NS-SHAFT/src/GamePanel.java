@@ -11,6 +11,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private int panelWidth = 470, panelHeight = 700;
     private HashSet<Platform> scored = new HashSet<>();
     private boolean leftPressed = false, rightPressed = false;
+    private boolean isNewHighScore = false;
 
     public GamePanel() {
         setPreferredSize(new Dimension(panelWidth, panelHeight));
@@ -33,6 +34,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         scored.clear();
         player.isAlive = true;
         player.health = 100;
+        isNewHighScore = false;
+        timer.start();
     }
 
     public void startGame() {
@@ -45,10 +48,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
         player.update();
 
+        int scrollSpeed = scoreManager.getScrollSpeed();
+        player.speed = Math.min(10.0, 3.0 + scrollSpeed * 0.5);
+
         if (leftPressed && player.x > 0) player.moveLeft();
         if (rightPressed && player.x + player.width < panelWidth) player.moveRight();
 
-        int scrollSpeed = scoreManager.getScrollSpeed();
         platformManager.update(scrollSpeed);
         platformManager.checkCollision(player);
 
@@ -59,7 +64,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             }
         }
 
-        if (player.y > panelHeight || player.y < 0) player.isAlive = false;
+        if (player.y > panelHeight || player.y < 0) {
+            player.isAlive = false;
+            if (scoreManager.shouldUpdateHighScore()) {
+                scoreManager.updateHighScoreIfNeeded();
+                isNewHighScore = true;
+            }
+        }
 
         repaint();
     }
@@ -74,12 +85,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
         player.draw(g);
 
-        // 分數顯示
         g.setColor(Color.BLUE);
         g.setFont(new Font("Arial", Font.PLAIN, 18));
         g.drawString("Score: " + scoreManager.getScore(), 10, 20);
+        g.drawString("High Score: " + scoreManager.getHighScore(), 10, 40);
 
-        // HP Bar
         g.setColor(Color.GRAY);
         g.fillRect(360, 10, 100, 10);
         g.setColor(Color.RED);
@@ -93,22 +103,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             g.drawString("Game Over", panelWidth / 2 - 80, panelHeight / 2);
             g.setFont(new Font("Arial", Font.PLAIN, 18));
             g.drawString("Click to restart", panelWidth / 2 - 70, panelHeight / 2 + 40);
+
+            if (isNewHighScore) {
+                g.setColor(Color.ORANGE);
+                g.drawString("New High Score!", panelWidth / 2 - 70, panelHeight / 2 + 70);
+            }
         }
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
+    @Override public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = true;
         if (!player.isAlive && e.getKeyCode() == KeyEvent.VK_SPACE) initGame();
     }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
+    @Override public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = false;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = false;
     }
-
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void mouseClicked(MouseEvent e) {
         if (!player.isAlive) initGame();
