@@ -28,7 +28,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     private void initGame() {
-        player = new Player(panelWidth / 2 - 15, 100);
+        player = new Player(panelWidth / 2 - 15, 250);
         platformManager.init(player);
         scoreManager.reset();
         scored.clear();
@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         player.update();
 
         int scrollSpeed = scoreManager.getScrollSpeed();
-        player.speed = Math.min(10.0, 3.0 + scrollSpeed * 0.5);
+        player.speed = Math.min(10.0, 3.0 + scrollSpeed * 0.5); //玩家隨著場景加速而加速
 
         if (leftPressed && player.x > 0) player.moveLeft();
         if (rightPressed && player.x + player.width < panelWidth) player.moveRight();
