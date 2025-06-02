@@ -1,32 +1,65 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Player {
     public int x, y, prevY;
-    public int width = 30, height = 30;
+    public int width = 32, height = 32;
     public double velocityY = 0;
     public double speed = 5;
     public boolean isAlive = true;
-    public int health = 100; // 用百分比顯示
+    public int health = 100;
 
-    public Player(int x, int y) {
+    private Action idleAnimation;
+    private Action walkLeftAnimation;
+    private Action walkRightAnimation;
+    private Action currentAnimation;
+
+    private boolean movingLeft = false;
+    private boolean movingRight = false;
+
+    public Player(int x, int y, BufferedImage[] idleFrames,
+                  BufferedImage[] walkRightFrames,
+                  BufferedImage[] walkLeftFrames) {
         this.x = x;
         this.y = y;
         this.prevY = y;
+        this.idleAnimation = new Action(idleFrames, 5);
+        this.walkRightAnimation = new Action(walkRightFrames, 5);
+        this.walkLeftAnimation = new Action(walkLeftFrames, 5);
+        this.currentAnimation = idleAnimation;
     }
 
     public void update() {
-        //speed+=0.1;
         prevY = y;
         velocityY += 0.5;
         y += velocityY;
+
+        if (movingLeft) {
+            currentAnimation = walkLeftAnimation;
+        } else if (movingRight) {
+            currentAnimation = walkRightAnimation;
+        } else {
+            currentAnimation = idleAnimation;
+        }
+
+        currentAnimation.update();
     }
 
     public void moveLeft() {
         x -= speed;
+        movingLeft = true;
+        movingRight = false;
     }
 
     public void moveRight() {
         x += speed;
+        movingRight = true;
+        movingLeft = false;
+    }
+
+    public void stopMoving() {
+        movingLeft = false;
+        movingRight = false;
     }
 
     public void takeDamage() {
@@ -46,7 +79,6 @@ public class Player {
     }
 
     public void draw(Graphics g) {
-        g.setColor(new Color(255, 100, 100));
-        g.fillRect(x, y, width, height);
+        g.drawImage(currentAnimation.getCurrentFrame(), x, y, width, height, null);
     }
 }
