@@ -61,7 +61,7 @@ public class PlatformManager {
 
                 if (onPlatform) {
                     // 緩速垂直速度，讓玩家慢慢穿過平台
-                    player.velocityY *= 0.5;
+                    player.velocityY *= 0.2;
                 }
             }
         }
