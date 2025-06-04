@@ -27,8 +27,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         platformManager = new PlatformManager(panelWidth, panelHeight);
         scoreManager = new ScoreManager();
         timer = new Timer(16, this);
-
-        initGame();
     }
 
     private void loadBackground(String path) {
@@ -72,6 +70,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     public void startGame() {
+        initGame();
         timer.start();
     }
 
